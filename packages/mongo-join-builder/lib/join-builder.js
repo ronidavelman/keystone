@@ -89,11 +89,13 @@ function pipelineBuilder(query) {
   const { matchTerm, postJoinPipeline, relationshipIdTerm, relationships, excludeFields } = query;
 
   const relationshipPipelines = Object.entries(relationships).map(([uid, relationship]) => {
-    const { field, many, from } = relationship;
+    const { field, many, from, rel } = relationship;
+    const { tableName, cardinality } = rel;
+    console.log('----', { tableName, cardinality });
     const uniqueField = `${uid}_${field}`;
     const idsName = `${uniqueField}_id${many ? 's' : ''}`;
     const fieldSize = { $size: `$${uniqueField}` };
-    return [
+    const ret = [
       {
         $lookup: {
           from,
@@ -123,6 +125,8 @@ function pipelineBuilder(query) {
         },
       },
     ];
+    console.log(JSON.stringify(ret, null, 4));
+    return ret;
   });
 
   return [

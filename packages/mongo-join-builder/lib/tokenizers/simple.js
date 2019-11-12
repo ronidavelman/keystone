@@ -15,19 +15,13 @@ const simpleTokenizer = (listAdapter, query, queryKey, path) => {
       )
     ),
   };
-  if (queryKey in simpleQueryConditions) {
-    return { matchTerm: simpleQueryConditions[queryKey](query[queryKey], query) };
-  }
-
-  if (queryKey in modifierConditions) {
-    return {
-      postJoinPipeline: [modifierConditions[queryKey](query[queryKey], query, refListAdapter)],
-    };
-  }
-
-  // Nothing found, return an empty operation
-  // TODO: warn?
-  return {};
+  return queryKey in simpleQueryConditions
+    ? { matchTerm: simpleQueryConditions[queryKey](query[queryKey], query) }
+    : queryKey in modifierConditions
+    ? {
+        postJoinPipeline: [modifierConditions[queryKey](query[queryKey], query, refListAdapter)],
+      }
+    : {};
 };
 
 const modifierConditions = {
@@ -36,11 +30,7 @@ const modifierConditions = {
     if (!value || (getType(value) === 'String' && !value.trim())) {
       return undefined;
     }
-    return {
-      $match: {
-        name: new RegExp(`${escapeRegExp(value)}`, 'i'),
-      },
-    };
+    return { $match: { name: new RegExp(`${escapeRegExp(value)}`, 'i') } };
   },
 
   $orderBy: (value, _, listAdapter) => {
@@ -48,32 +38,11 @@ const modifierConditions = {
 
     const mongoField = listAdapter.graphQlQueryPathToMongoField(orderField);
 
-    return {
-      $sort: {
-        [mongoField]: orderDirection === 'DESC' ? -1 : 1,
-      },
-    };
+    return { $sort: { [mongoField]: orderDirection === 'DESC' ? -1 : 1 } };
   },
-
-  $skip: value => {
-    if (value < Infinity && value > 0) {
-      return {
-        $skip: value,
-      };
-    }
-  },
-
-  $first: value => {
-    if (value < Infinity && value > 0) {
-      return {
-        $limit: value,
-      };
-    }
-  },
-
-  $count: value => ({
-    $count: value,
-  }),
+  $skip: value => (value < Infinity && value > 0 ? { $skip: value } : undefined),
+  $first: value => (value < Infinity && value > 0 ? { $limit: value } : undefined),
+  $count: value => ({ $count: value }),
 };
 
 module.exports = { simpleTokenizer };

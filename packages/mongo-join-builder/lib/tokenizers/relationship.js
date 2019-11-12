@@ -34,6 +34,7 @@ const relationshipTokenizer = (listAdapter, query, queryKey, path, uid) => {
     matchTerm: { [`${uid}_${fieldAdapter.path}_${filterType}`]: true },
     // Flag this is a to-many relationship
     many: fieldAdapter.field.many,
+    rel: fieldAdapter.rel,
   };
 };
 

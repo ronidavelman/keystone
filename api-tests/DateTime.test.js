@@ -79,9 +79,8 @@ multiAdapterRunners().map(({ runner, adapterName }) =>
           const postedAt = '2018-08-31T06:49:07.000Z';
 
           const createPost = await create('Post', { postedAt });
-
           // Create an item that does the linking
-          const { data } = await graphqlRequest({
+          const { data, errors } = await graphqlRequest({
             keystone,
             query: `
         query {
@@ -91,7 +90,6 @@ multiAdapterRunners().map(({ runner, adapterName }) =>
         }
     `,
           });
-
           expect(data).toHaveProperty('Post.postedAt', postedAt);
         })
       );
@@ -112,7 +110,6 @@ multiAdapterRunners().map(({ runner, adapterName }) =>
         }
     `,
           });
-
           expect(errors).toBe(undefined);
           expect(data).toHaveProperty('createPost.postedAt', postedAt);
         })

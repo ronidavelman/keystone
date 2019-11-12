@@ -114,7 +114,7 @@ multiAdapterRunners().map(({ runner, adapterName }) =>
         );
       });
 
-      describe('to-many', () => {
+      describe.only('to-many', () => {
         const setup = async create => {
           const posts = await Promise.all([
             create('Post', { title: 'Hello' }),
@@ -135,11 +135,11 @@ multiAdapterRunners().map(({ runner, adapterName }) =>
           return { posts, users };
         };
 
-        test(
+        test.only(
           '_every condition',
           runner(setupKeystone, async ({ keystone, create }) => {
             const { users } = await setup(create);
-
+            console.log('----');
             // EVERY
             const { data, errors } = await graphqlRequest({
               keystone,
