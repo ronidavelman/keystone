@@ -74,12 +74,18 @@ class KnexAdapter extends BaseKeystoneAdapter {
 
     // Run this only if explicity configured and still never in production
     if (this.config.dropDatabase && process.env.NODE_ENV !== 'production') {
-      console.log('Knex adapter: Dropping database');
       await this.dropDatabase();
+    } else if (this.config.initDatabase && process.env.NODE_ENV !== 'production') {
+      await this._initSchema();
     } else {
       return [];
     }
+  }
 
+  async _initSchema() {
+    await this.dropDatabase();
+    this.knex.raw(`CREATE SCHEMA ${this.schemaName}`);
+    console.log('Knex adapter: Initialising database');
     const createResult = await pSettle(
       Object.values(this.listAdapters).map(listAdapter => listAdapter.createTable())
     );
@@ -201,10 +207,11 @@ class KnexAdapter extends BaseKeystoneAdapter {
 
   // This will completely drop the backing database. Use wisely.
   dropDatabase() {
-    const tables = Object.values(this.listAdapters)
-      .map(listAdapter => `"${this.schemaName}"."${listAdapter.tableName}"`)
-      .join(',');
-    return this.knex.raw(`DROP TABLE IF EXISTS ${tables} CASCADE`);
+    console.log('Knex adapter: Dropping database');
+    // const tables = Object.values(this.listAdapters)
+    //   .map(listAdapter => `"${this.schemaName}"."${listAdapter.tableName}"`)
+    //   .join(',');
+    return this.knex.raw(`DROP SCHEMA IF EXISTS ${this.schemaName} CASCADE`);
   }
 
   getDefaultPrimaryKeyConfig() {
