@@ -10,8 +10,8 @@ const keystone = new Keystone({
   adapter: new KnexAdapter({
     schemaName: 'public',
     knexOptions: {
-      connection: 'postgres://keystone5:k3yst0n3@localhost:5432/keystone'
-    }
+      connection: 'postgres://keystone5:k3yst0n3@localhost:5432/keystone',
+    },
   }),
 });
 
