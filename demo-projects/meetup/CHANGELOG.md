@@ -1,5 +1,11 @@
 # @keystonejs/demo-project-meetup
 
+## 5.0.5
+
+### Patch Changes
+
+- [`933b3111`](https://github.com/keystonejs/keystone/commit/933b3111af7d629183013e1b42c2026cfbaaa5f4) [#2193](https://github.com/keystonejs/keystone/pull/2193) - Fixed typo in filename
+
 ## 5.0.4
 
 ### Patch Changes
